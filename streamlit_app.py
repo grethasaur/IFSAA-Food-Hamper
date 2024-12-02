@@ -23,19 +23,21 @@ st.success("Connected to Snowflake!")
 
 # Load model from Snowflake stage
 @st.cache_resource
-def load_model_from_snowflake():
-    stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/trained_model_and_lambda.pkl'
-
-    # Use a NamedTemporaryFile without the 'delete=False' parameter
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        # Download the file from Snowflake to the temporary file
-        session.file.get(stage_file_path, temp_file.name)
-
-        # Load the model from the temporary file
-        model = joblib.load(temp_file.name)
+def load_model_from_github():
+    # Replace with your GitHub raw URL
+    github_url = 'https://github.com/grethasaur/IFSAA-Food-Hamper/blob/main/trained_model_and_lambda.pkl'
     
-    # Return the loaded model
-    return model
+    # Fetch the file using the requests library
+    response = requests.get(github_url)
+    
+    # Check if the file is fetched successfully
+    if response.status_code == 200:
+        # Load the model from the raw content
+        model = joblib.load(BytesIO(response.content))
+        return model
+    else:
+        st.error("Failed to download the model from GitHub.")
+        return None
 
 # Retrieve the historical data CSV from Snowflake stage
 @st.cache_resource
