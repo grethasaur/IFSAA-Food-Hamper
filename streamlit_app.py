@@ -21,26 +21,29 @@ st.success("Connected to Snowflake!")
 # Load model from Snowflake stage
 @st.cache_resource
 def load_model_from_snowflake():
-    stage_file_path = "@model_stage/trained_model_and_lambda.pkl"
+    stage_file_path = "@"LAB"."PUBLIC"."IFSAA"/trained_model_and_lambda.pkl"
     local_file_path = "trained_model_and_lambda.pkl"
     session.file.get(stage_file_path, local_file_path)
     return joblib.load(local_file_path)
 
-# Load historical data from Snowflake
-@st.cache_data
-def load_historical_data():
-    query = """
-    SELECT *
-    FROM HISTORICAL_DATA
-    """
-    df = session.sql(query).to_pandas()
-    df['date'] = pd.to_datetime(df['date']).dt.date
-    df.set_index('date', inplace=True)
-    return df
+# Retrieve the historical data CSV from Snowflake stage
+@st.cache_resource
+def load_historical_data_from_snowflake():
+    # Define the stage file path for historical data
+    stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/historical_data.csv'
+    
+    # Define the local path to store the CSV file temporarily
+    local_file_path = 'historical_data.csv'
+    
+    # Use the Snowflake session to get the file
+    session.file.get(stage_file_path, local_file_path)
+    
+    # Load the CSV file into a pandas DataFrame
+    return pd.read_csv(local_file_path)
 
 # Load resources
 final_model, fitted_lambda = load_model_from_snowflake()
-historical_data = load_historical_data()
+historical_data = load_historical_data_from_snowflake()
 
 # Function to calculate lagged features
 def create_lagged_features(historical_data, input_date, scheduled_date_count):
