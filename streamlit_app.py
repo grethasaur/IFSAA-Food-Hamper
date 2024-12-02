@@ -25,17 +25,19 @@ st.success("Connected to Snowflake!")
 # Load model from Snowflake stage
 @st.cache_resource
 def load_model_from_github():
-    url = "https://github.com/grethasaur/IFSAA-Food-Hamper/blob/main/trained_model_and_lambda.pkl"
-    response = requests.get(url)
-    
+    model_url = "https://github.com/grethasaur/IFSAA-Food-Hamper/blob/main/trained_model_and_lambda.pkl"
+    response = requests.get(model_url)
     if response.status_code == 200:
         try:
-            model = pickle.load(BytesIO(response.content))
-            return model
+            model = joblib.load(BytesIO(response.content))
+            fitted_lambda = ...  # Load the lambda here if applicable
+            return model, fitted_lambda
         except Exception as e:
             st.error(f"Error loading model: {e}")
+            return None
     else:
         st.error("Failed to download the model from GitHub.")
+        return None
 
 # Retrieve the historical data CSV from Snowflake stage
 @st.cache_resource
