@@ -21,8 +21,8 @@ st.success("Connected to Snowflake!")
 # Load model from Snowflake stage
 @st.cache_resource
 def load_model_from_snowflake():
-    stage_file_path = "@"LAB"."PUBLIC"."IFSAA"/trained_model_and_lambda.pkl"
-    local_file_path = "trained_model_and_lambda.pkl"
+    stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/trained_model_and_lambda.pkl'
+    local_file_path = 'trained_model_and_lambda.pkl'
     session.file.get(stage_file_path, local_file_path)
     return joblib.load(local_file_path)
 
