@@ -23,36 +23,23 @@ st.success("Connected to Snowflake!")
 @st.cache_resource
 def load_model_from_snowflake():
     stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/trained_model_and_lambda.pkl'
-    local_file_path = 'trained_model_and_lambda.pkl'
     
-    # Create the local directory if it doesn't exist
-    local_dir = os.path.dirname(local_file_path)
-    if not os.path.exists(local_dir):
-        os.makedirs(local_dir)
-        
-    # Download the model file from Snowflake stage to local path
-    session.file.get(stage_file_path, local_file_path)
-    return joblib.load(local_file_path)
+    # Directly retrieve and load the model from Snowflake
+    with session.file.get(stage_file_path) as file:
+        model = joblib.load(file)
+    
+    return model
 
 # Retrieve the historical data CSV from Snowflake stage
 @st.cache_resource
 def load_historical_data_from_snowflake():
-    # Define the stage file path for historical data
     stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/historical_data.csv'
     
-    # Define the local path to store the CSV file temporarily
-    local_file_path = 'historical_data.csv'
-
-    # Create the local directory if it doesn't exist
-    local_dir = os.path.dirname(local_file_path)
-    if not os.path.exists(local_dir):
-        os.makedirs(local_dir)
+    # Directly retrieve and load the CSV file from Snowflake
+    with session.file.get(stage_file_path) as file:
+        df = pd.read_csv(file)
     
-    # Use the Snowflake session to get the file
-    session.file.get(stage_file_path, local_file_path)
-    
-    # Load the CSV file into a pandas DataFrame
-    return pd.read_csv(local_file_path)
+    return df
 
 # Load resources
 final_model, fitted_lambda = load_model_from_snowflake()
