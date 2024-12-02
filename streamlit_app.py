@@ -24,7 +24,8 @@ st.success("Connected to Snowflake!")
 # Load model from GitHub
 @st.cache_resource
 def load_model_from_github():
-    model_url = "https://raw.githubusercontent.com/grethasaur/IFSAA-Food-Hamper/blob/ada46c96a8f697d2081f5af8e4b2b38658f62677/trained_model_and_lambda.pkl"
+    model_url = "https://github.com/grethasaur/IFSAA-Food-Hamper/blob/main/trained_model_and_lambda.pkl"
+    
     try:
         # Fetch the model file from the GitHub raw URL
         response = requests.get(model_url)
