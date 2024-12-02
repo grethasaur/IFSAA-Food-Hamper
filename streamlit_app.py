@@ -10,7 +10,6 @@ from datetime import datetime
 from scipy.special import inv_boxcox
 from snowflake.snowpark.session import Session
 
-
 # Establish Snowflake session
 @st.cache_resource
 def create_session():
@@ -22,7 +21,7 @@ session = create_session()
 st.success("Connected to Snowflake!")
 
 
-# Load model from Snowflake stage
+# Load model from GitHub
 @st.cache_resource
 def load_model_from_github():
     model_url = "https://raw.githubusercontent.com/grethasaur/IFSAA-Food-Hamper/blob/ada46c96a8f697d2081f5af8e4b2b38658f62677/trained_model_and_lambda.pkl"
@@ -47,6 +46,7 @@ def load_historical_data_from_snowflake():
     # Ensure the 'scheduled_date' column is in datetime format
     df['scheduled_date'] = pd.to_datetime(df['scheduled_date']).dt.date
     df.set_index('scheduled_date', inplace=True)
+    
     return df
 
 # Load resources
@@ -56,7 +56,7 @@ historical_data = load_historical_data_from_snowflake()
 # Function to calculate lagged features
 def create_lagged_features(historical_data, input_date, scheduled_date_count):
     data = historical_data.copy()
-    input_date = input_date.date()
+    input_date = input_date.date()  # Ensure input_date is in datetime.date format
 
     new_row = pd.DataFrame({'scheduled_date_count': [scheduled_date_count]},
                            index=[input_date])
