@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import io
+import tempfile
 import joblib
 import numpy as np
 import streamlit as st
@@ -25,16 +26,16 @@ st.success("Connected to Snowflake!")
 def load_model_from_snowflake():
     stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/trained_model_and_lambda.pkl'
 
-    # Use a BytesIO buffer to hold the model in memory
-    model_data = io.BytesIO()
+    # Create a temporary file to hold the model
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        temp_file_path = temp_file.name
+        
+        # Download the file from Snowflake to the temporary file
+        session.file.get(stage_file_path, temp_file_path)
+        
+        # Load the model from the temporary file
+        model = joblib.load(temp_file_path)
 
-    # Download the file from Snowflake directly into the memory buffer
-    session.file.get(stage_file_path, model_data)
-
-    # Load the model from the in-memory buffer
-    model_data.seek(0)  # Ensure we're at the beginning of the BytesIO object
-    model = joblib.load(model_data)
-    
     return model
 
 # Retrieve the historical data CSV from Snowflake stage
