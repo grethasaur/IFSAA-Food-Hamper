@@ -43,7 +43,10 @@ def load_model_from_github():
 def load_historical_data_from_snowflake():
     # Use the existing session object to query the table directly
     df = session.table("LAB.PUBLIC.HISTORICAL_DATA").to_pandas()
-
+    
+    # Ensure the 'scheduled_date' column is in datetime format
+    df['scheduled_date'] = pd.to_datetime(df['scheduled_date']).dt.date
+    df.set_index('scheduled_date', inplace=True)
     return df
 
 # Load resources
