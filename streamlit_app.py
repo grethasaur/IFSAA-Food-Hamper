@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import requests
-import io
+from io import BytesIO
 import tempfile
 import joblib
 import numpy as np
