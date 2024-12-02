@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import requests
 import io
 import tempfile
 import joblib
