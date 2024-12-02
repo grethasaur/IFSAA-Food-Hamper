@@ -25,18 +25,15 @@ st.success("Connected to Snowflake!")
 # Load model from Snowflake stage
 @st.cache_resource
 def load_model_from_github():
-    model_url = "https://github.com/grethasaur/IFSAA-Food-Hamper/blob/main/trained_model_and_lambda.pkl"
+    model_url = "https://github.com/grethasaur/IFSAA-Food-Hamper/blob/ada46c96a8f697d2081f5af8e4b2b38658f62677/trained_model_and_lambda.pkl"
     response = requests.get(model_url)
+    st.write(f"Response status code: {response.status_code}")  # Debugging line
     if response.status_code == 200:
-        try:
-            model = joblib.load(BytesIO(response.content))
-            fitted_lambda = ...  # Load the lambda here if applicable
-            return model, fitted_lambda
-        except Exception as e:
-            st.error(f"Error loading model: {e}")
-            return None
+        model = joblib.load(BytesIO(response.content))
+        fitted_lambda = ...  # Add your logic for lambda
+        return model, fitted_lambda
     else:
-        st.error("Failed to download the model from GitHub.")
+        st.error("Failed to fetch model from GitHub.")
         return None
 
 # Retrieve the historical data CSV from Snowflake stage
