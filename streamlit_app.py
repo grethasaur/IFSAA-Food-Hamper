@@ -43,16 +43,9 @@ def load_model_from_github():
 # Retrieve the historical data CSV from Snowflake stage
 @st.cache_resource
 def load_historical_data_from_snowflake():
-    stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/historical_data.csv'
-    
-    # Create a temporary file to hold the CSV data
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        # Download the CSV file from Snowflake to the temporary file
-        session.file.get(stage_file_path, temp_file.name)
-        
-        # Load the CSV data from the temporary file
-        df = pd.read_csv(temp_file.name)
-    
+    # Use the existing session object to query the table directly
+    df = session.table("LAB.PUBLIC.HISTORICAL_DATA").to_pandas()
+
     return df
 
 # Load resources
