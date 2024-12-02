@@ -43,17 +43,9 @@ def load_historical_data_from_snowflake():
     # Use the existing session object to query the table directly
     df = session.table("LAB.PUBLIC.HISTORICAL_DATA").to_pandas()
 
-    # Check available columns to ensure 'scheduled_date' exists
-    st.write(df.columns)  # Display the columns in the dataframe for debugging
-
-    # Ensure the 'scheduled_date' column is in datetime format, adjust the name if needed
-    if 'scheduled_date' in df.columns:
-        df['scheduled_date'] = pd.to_datetime(df['scheduled_date']).dt.date
-        df.set_index('scheduled_date', inplace=True)
-    else:
-        st.error("Column 'scheduled_date' not found in historical data!")
-    
-    return df
+    # Ensure the 'DATE' column is in datetime format
+    df['DATE'] = pd.to_datetime(df['DATE']).dt.date
+    df.set_index('DATE', inplace=True)
     
     return df
 
@@ -64,15 +56,16 @@ historical_data = load_historical_data_from_snowflake()
 # Function to calculate lagged features
 def create_lagged_features(historical_data, input_date, scheduled_date_count):
     data = historical_data.copy()
-    input_date = input_date.date()  # Ensure input_date is in datetime.date format
+    input_date = input_date.date()
 
-    new_row = pd.DataFrame({'scheduled_date_count': [scheduled_date_count]},
+    new_row = pd.DataFrame({'SCHEDULED_DATE_COUNT': [scheduled_date_count]},
                            index=[input_date])
     data = pd.concat([data, new_row]).sort_index()
 
+    # Add lag features
     for lag in [7, 14, 21]:
-        data[f'pickup_date_count_lag_{lag}'] = data['scheduled_date_count'].shift(lag)
-        data[f'scheduled_date_count_{lag}'] = data['scheduled_date_count'].shift(lag)
+        data[f'PICKUP_DATE_COUNT_LAG_{lag}'] = data['SCHEDULED_DATE_COUNT'].shift(lag)
+        data[f'SCHEDULED_DATE_COUNT_{lag}'] = data['SCHEDULED_DATE_COUNT'].shift(lag)
 
     lagged_features = data.loc[input_date]
     if lagged_features.isnull().any():
