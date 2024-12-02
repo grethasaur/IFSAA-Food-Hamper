@@ -6,23 +6,17 @@ from datetime import datetime
 from scipy.special import inv_boxcox
 from snowflake.snowpark.session import Session
 
-# Snowflake configuration using Streamlit secrets
-snowflake_config = {
-    "account": st.secrets["snowflake_account"],
-    "user": st.secrets["snowflake_user"],
-    "password": st.secrets["snowflake_password"],
-    "role": st.secrets["snowflake_role"],
-    "warehouse": st.secrets["snowflake_warehouse"],
-    "database": st.secrets["snowflake_database"],
-    "schema": st.secrets["snowflake_schema"]
-}
 
-# Initialize Snowflake session
+# Establish Snowflake session
 @st.cache_resource
-def init_snowflake_session():
-    return Session.builder.configs(snowflake_config).create()
+def create_session():
+    return Session.builder.configs(st.secrets["snowflake"]).create()
 
-session = init_snowflake_session()
+session = create_session()
+
+# Test connection
+st.success("Connected to Snowflake!")
+
 
 # Load model from Snowflake stage
 @st.cache_resource
