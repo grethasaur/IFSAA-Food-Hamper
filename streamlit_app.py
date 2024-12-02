@@ -55,7 +55,7 @@ def load_historical_data_from_snowflake():
     return df
 
 # Load resources
-final_model, fitted_lambda = load_model_from_snowflake()
+final_model, fitted_lambda = load_model_from_github()
 historical_data = load_historical_data_from_snowflake()
 
 # Function to calculate lagged features
