@@ -96,7 +96,7 @@ def predict(year, month, day, scheduled_date_count):
         return f"An error occurred: {e}"
 
 # Streamlit App
-st.title("Pickup Date Count Predictor (Streamlit + Snowflake)")
+st.title("Hamper Pickup Count Predictor (Streamlit + Snowflake)")
 st.write("Select a date and enter the scheduled date count to predict the pickup date count.")
 
 # User inputs
