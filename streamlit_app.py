@@ -25,13 +25,15 @@ st.success("Connected to Snowflake!")
 def load_model_from_snowflake():
     stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/trained_model_and_lambda.pkl'
 
-    # Use session.file.get() to retrieve the file into memory
-    file_stream = io.BytesIO()
-    session.file.get(stage_file_path, file_stream)
+    # Use a BytesIO buffer to hold the model in memory
+    model_data = io.BytesIO()
 
-    # Load the model from the in-memory file stream
-    file_stream.seek(0)  # Reset the pointer to the start of the stream
-    model = joblib.load(file_stream)
+    # Download the file from Snowflake directly into the memory buffer
+    session.file.get(stage_file_path, model_data)
+
+    # Load the model from the in-memory buffer
+    model_data.seek(0)  # Ensure we're at the beginning of the BytesIO object
+    model = joblib.load(model_data)
     
     return model
 
