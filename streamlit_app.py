@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import tempfile
 import joblib
 import numpy as np
 import streamlit as st
@@ -24,9 +25,13 @@ st.success("Connected to Snowflake!")
 def load_model_from_snowflake():
     stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/trained_model_and_lambda.pkl'
     
-    # Directly retrieve and load the model from Snowflake
-    with session.file.get(stage_file_path) as file:
-        model = joblib.load(file)
+    # Create a temporary file to hold the model
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        # Download the file from Snowflake to the temporary file
+        session.file.get(stage_file_path, temp_file.name)
+        
+        # Load the model from the temporary file
+        model = joblib.load(temp_file.name)
     
     return model
 
@@ -35,9 +40,13 @@ def load_model_from_snowflake():
 def load_historical_data_from_snowflake():
     stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/historical_data.csv'
     
-    # Directly retrieve and load the CSV file from Snowflake
-    with session.file.get(stage_file_path) as file:
-        df = pd.read_csv(file)
+    # Create a temporary file to hold the CSV data
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        # Download the CSV file from Snowflake to the temporary file
+        session.file.get(stage_file_path, temp_file.name)
+        
+        # Load the CSV data from the temporary file
+        df = pd.read_csv(temp_file.name)
     
     return df
 
