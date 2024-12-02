@@ -26,17 +26,23 @@ st.success("Connected to Snowflake!")
 def load_model_from_snowflake():
     stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/trained_model_and_lambda.pkl'
 
-    # Create a temporary file to hold the model
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        temp_file_path = temp_file.name
-        
+    # Create a unique temporary file to hold the model
+    fd, temp_file_path = tempfile.mkstemp(suffix='.pkl')
+    os.close(fd)  # Close the file descriptor to ensure the file can be used
+
+    try:
         # Download the file from Snowflake to the temporary file
         session.file.get(stage_file_path, temp_file_path)
-        
+
         # Load the model from the temporary file
         model = joblib.load(temp_file_path)
 
-    return model
+        return model
+
+    finally:
+        # Clean up the temporary file after usage
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
 
 # Retrieve the historical data CSV from Snowflake stage
 @st.cache_resource
