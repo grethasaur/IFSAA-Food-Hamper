@@ -42,10 +42,18 @@ def load_model_from_github():
 def load_historical_data_from_snowflake():
     # Use the existing session object to query the table directly
     df = session.table("LAB.PUBLIC.HISTORICAL_DATA").to_pandas()
+
+    # Check available columns to ensure 'scheduled_date' exists
+    st.write(df.columns)  # Display the columns in the dataframe for debugging
+
+    # Ensure the 'scheduled_date' column is in datetime format, adjust the name if needed
+    if 'scheduled_date' in df.columns:
+        df['scheduled_date'] = pd.to_datetime(df['scheduled_date']).dt.date
+        df.set_index('scheduled_date', inplace=True)
+    else:
+        st.error("Column 'scheduled_date' not found in historical data!")
     
-    # Ensure the 'scheduled_date' column is in datetime format
-    df['scheduled_date'] = pd.to_datetime(df['scheduled_date']).dt.date
-    df.set_index('scheduled_date', inplace=True)
+    return df
     
     return df
 
