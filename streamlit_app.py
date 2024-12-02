@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 import joblib
 import numpy as np
 import streamlit as st
@@ -23,6 +24,13 @@ st.success("Connected to Snowflake!")
 def load_model_from_snowflake():
     stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/trained_model_and_lambda.pkl'
     local_file_path = 'trained_model_and_lambda.pkl'
+    
+    # Create the local directory if it doesn't exist
+    local_dir = os.path.dirname(local_file_path)
+    if not os.path.exists(local_dir):
+        os.makedirs(local_dir)
+        
+    # Download the model file from Snowflake stage to local path
     session.file.get(stage_file_path, local_file_path)
     return joblib.load(local_file_path)
 
@@ -34,6 +42,11 @@ def load_historical_data_from_snowflake():
     
     # Define the local path to store the CSV file temporarily
     local_file_path = 'historical_data.csv'
+
+    # Create the local directory if it doesn't exist
+    local_dir = os.path.dirname(local_file_path)
+    if not os.path.exists(local_dir):
+        os.makedirs(local_dir)
     
     # Use the Snowflake session to get the file
     session.file.get(stage_file_path, local_file_path)
