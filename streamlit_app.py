@@ -26,10 +26,9 @@ st.success("Connected to Snowflake!")
 def load_model_from_snowflake():
     stage_file_path = '@"LAB"."PUBLIC"."IFSAA"/trained_model_and_lambda.pkl'
 
-    # Create a unique temporary file to hold the model
-    fd, temp_file_path = tempfile.mkstemp(suffix='.pkl')
-    os.close(fd)  # Close the file descriptor to ensure the file can be used
-
+    # Create a unique temporary file path
+    temp_file_path = tempfile.mktemp(suffix='.pkl')  # Generates a unique file name
+    
     try:
         # Download the file from Snowflake to the temporary file
         session.file.get(stage_file_path, temp_file_path)
